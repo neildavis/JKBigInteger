@@ -7,7 +7,7 @@ Pod::Spec.new do |s|
   s.homepage     = "https://github.com/neildavis/JKBigInteger"
   s.license      = "MIT"
   s.platform     = :ios
-  s.source       = { :git => "https://github.com/neildavis/JKBigInteger.git", :tag => "0.0.1" }
+  s.source       = { :git => "https://github.com/neildavis/JKBigInteger.git", :tag => "0.0.3" }
   s.source_files  = "JKBigInteger/*.{h,m}", "JKBigInteger/LibTomMath/*.{h,c}"
   s.requires_arc = true
 
