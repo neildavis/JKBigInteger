@@ -11888,4 +11888,20 @@
     XCTAssertEqualObjects([result stringValueWithRadix:2], @"1", @"GCD test 99 failed");
 }
 
+- (void) testDataConversionUnsigned
+{
+    JKBigInteger *int1 = [[JKBigInteger alloc] initWithString:@"01f102f203f304f405f506f607f708f809f90afa" andRadix:16];
+    NSData *data1 = [int1 unsignedData];
+    JKBigInteger *int2 = [[JKBigInteger alloc] initWithUnsignedData:data1];
+    XCTAssertEqualObjects(int1, int2);
+}
+
+- (void) testDataConversionSigned
+{
+    JKBigInteger *int1 = [[JKBigInteger alloc] initWithString:@"-102030405060708090112131415161718191" andRadix:10];
+    NSData *data1 = [int1 signedData];
+    JKBigInteger *int2 = [[JKBigInteger alloc] initWithSignedData:data1];
+    XCTAssertEqualObjects(int1, int2);
+}
+
 @end

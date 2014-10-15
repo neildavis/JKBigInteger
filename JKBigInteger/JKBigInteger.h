@@ -20,6 +20,9 @@
 - (id)initWithCString:(char *)cString;
 - (id)initWithCString:(char *)cString andRadix:(int)radix;
 
+- (instancetype) initWithUnsignedData:(NSData*)data;
+- (instancetype) initWithSignedData:(NSData*)data;
+
 - (id)add:(JKBigInteger *)bigInteger;
 - (id)subtract:(JKBigInteger *)bigInteger;
 - (id)multiply:(JKBigInteger *)bigInteger;
@@ -53,5 +56,8 @@
 - (unsigned int)countBytes;
 - (void)toByteArraySigned: (unsigned char*) byteArray;
 - (void)toByteArrayUnsigned: (unsigned char*) byteArray;
+
+- (NSData*) unsignedData;
+- (NSData*) signedData;
 
 @end

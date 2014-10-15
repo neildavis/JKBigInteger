@@ -79,6 +79,48 @@
     return [self initWithCString:(char *)[string UTF8String] andRadix:radix];
 }
 
+- (instancetype) initWithUnsignedData:(NSData *)data
+{
+    int len = (int)data.length;
+    if (len > 0)
+    {
+        mp_int mpi;
+        
+        unsigned char *bytes = (unsigned char*)[data bytes];
+        unsigned char *ptr = bytes;
+        mp_init_set_int(&mpi, (*bytes & 0xff));
+        while (++ptr < bytes + len)
+        {
+            mp_mul_2d(&mpi, 8, &mpi);
+            mpi.dp[0] |= (*ptr & 0xff);
+        }
+        
+        self = [self initWithValue:&mpi];
+        mp_clear(&mpi);
+    }
+    else
+    {
+        self = [self init];
+    }
+    return self;
+}
+
+- (instancetype) initWithSignedData:(NSData *)data
+{
+    if (data.length > 1)
+    {
+        NSData *unsignedData = [data subdataWithRange:NSMakeRange(1, data.length - 1)];
+        unsigned char signChr = ((unsigned char*)[data bytes])[0];
+        self = [self initWithUnsignedData:unsignedData];
+        if (MP_ZPOS != signChr)
+        {
+            m_value.sign = MP_NEG;
+        }
+        return self;
+    }
+    return [self init];
+}
+
 - (id)initWithCoder:(NSCoder *)decoder {
 
     self = [super init];
@@ -355,6 +397,19 @@
     }
 }
 
+- (BOOL) isEqual:(id)object {
+    return [self compare:object] == NSOrderedSame;
+}
+
+- (NSUInteger)hash {
+    NSUInteger ret = 0;
+    for (NSUInteger i = 0; i < m_value.used; i++)
+    {
+        ret |= m_value.dp[i];
+    }
+    return ret;
+}
+
 - (unsigned long)unsignedIntValue {
     return mp_get_int(&m_value);
 }
@@ -400,6 +455,22 @@
 /* Retrieves the unsigned [big endian] format of this JKBigInteger */
 - (void)toByteArrayUnsigned: (unsigned char*) byteArray {
     mp_to_unsigned_bin(&m_value, byteArray);
+}
+
+- (NSData*) unsignedData
+{
+    int len = mp_unsigned_bin_size(&m_value);
+    NSMutableData *data = [NSMutableData dataWithLength:len];
+    mp_to_unsigned_bin(&m_value, [data mutableBytes]);
+    return [data copy]; // copy strips mutability
+}
+
+- (NSData*) signedData
+{
+    int len = mp_signed_bin_size(&m_value);
+    NSMutableData *data = [NSMutableData dataWithLength:len];
+    mp_to_signed_bin(&m_value, [data mutableBytes]);
+    return [data copy]; // copy strips mutability
 }
 
 @end
